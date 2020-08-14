@@ -21,7 +21,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   dotnetSdkVersion: '3.1.x'
-  buildProjects: 'GnomenProperties.Console/*.csproj'
+  buildProjects: 'TimeCampAPI.Core/*.csproj'
 
 steps:
 - task: UseDotNet@2
@@ -33,7 +33,6 @@ steps:
   displayName: 'dotnet restore $(buildConfiguration) on $(imageName)'
   inputs:
     command: 'restore'
-    projects: '$(buildProjects)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet build $(buildConfiguration) on $(imageName)'
