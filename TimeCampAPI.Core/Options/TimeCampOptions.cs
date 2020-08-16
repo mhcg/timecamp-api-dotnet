@@ -18,17 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using Xunit;
-
-namespace TimeCampAPI.Tests
+namespace TimeCampAPI.Core.Options
 {
-    public class UnitTest1
+    public class TimeCampOptions
     {
-        [Fact]
-        public void Test1()
-        {
-            Assert.False(true);
-        }
+        public const string TimeCampAPI = "TimeCampAPI";
+
+        public string Token { get; set; } = "";
     }
 }

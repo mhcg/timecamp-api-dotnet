@@ -27,6 +27,15 @@ namespace TimeCampAPI.Core.Interfaces
 {
     public interface ITimeCampService
     {
+        /// <summary>
+        /// Get TimeCamp Time Entires.
+        /// </summary>
+        /// <param name="fromDate">From Date to get Time Entries.</param>
+        /// <param name="toDate">To Date to get Time Entries.</param>
+        /// <param name="taskIDs">List of Task IDs to filter the Time Enteries.</param>
+        /// <param name="userIDs">List of User IDs to filter the Time Enteries.</param>
+        /// <returns>List of TimeEntry objects.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If From Date is before To Date.</exception>
         Task<IEnumerable<TimeEntry>> GetTimeEntries(
             DateTime fromDate, DateTime toDate,
             IEnumerable<string>? taskIDs = null,

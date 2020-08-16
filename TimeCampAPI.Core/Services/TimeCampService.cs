@@ -44,10 +44,6 @@ namespace TimeCampAPI.Core.Services
 
         public TimeCampService(HttpClient httpClient)
         {
-            // TimeCampToken is required for the API calls.
-            httpClient.DefaultRequestHeaders.Add("Authorization",
-                TimeCampToken);
-
             SanityCheck(httpClient);
 
             HttpClient = httpClient;
