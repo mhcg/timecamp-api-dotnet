@@ -59,10 +59,9 @@ namespace TimeCampAPI.Tests
                 services.AddHttpClient<ITimeCampService, TimeCampService>(client =>
                 {
                     // Set the TimeCamp Token from Configuration.
-                    IConfiguration configuration = hostContext.Configuration;
-                    var timeCampOptions = new TimeCampOptions();
-                    configuration.GetSection(TimeCampOptions.TimeCampAPI).Bind(timeCampOptions);
-
+                    TimeCampOptions timeCampOptions = hostContext.Configuration
+                        .GetSection(TimeCampOptions.TimeCampAPI)
+                        .Get<TimeCampOptions>();
                     client.DefaultRequestHeaders
                         .Add("Authorization", timeCampOptions.Token);
                 });
@@ -74,9 +73,9 @@ namespace TimeCampAPI.Tests
         public async void CanAccessService()
         {
             // Try calling with no token set.
-            var now = System.DateTime.UtcNow;
+            var nonsenseTime = System.DateTime.MaxValue;
             var result = await Services.GetService<ITimeCampService>()
-                    .GetTimeEntries(now, now);
+                    .GetTimeEntries(nonsenseTime, nonsenseTime);
             Assert.NotNull(result);
             Assert.Equal(result, new List<TimeEntry>());
         }
