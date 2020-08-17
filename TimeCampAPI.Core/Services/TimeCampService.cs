@@ -36,7 +36,7 @@ namespace TimeCampAPI.Core.Services
     {
         internal TimeCampOptions TimeCampOptions { get; private set; }
         private HttpClient HttpClient { get; }
-        private ILogger Logger { get; }
+        private ILogger<TimeCampService> Logger { get; }
 
         public TimeCampService(HttpClient httpClient,
             IConfiguration configuration, ILogger<TimeCampService> logger)
@@ -53,8 +53,8 @@ namespace TimeCampAPI.Core.Services
             {
                 httpClient.DefaultRequestHeaders
                     .Add("Authorization", TimeCampOptions.Token);
-                HttpClient = httpClient;
             }
+            HttpClient = httpClient;
         }
 
         /// <summary>
@@ -120,15 +120,15 @@ namespace TimeCampAPI.Core.Services
         /// Helper method to make sure it's sane to call HttpClient.
         /// </summary>
         /// <param name="httpClient">HttpClient object to check.</param>
-        /// <exception cref="NotSupportedException">TimeCamp Token must be set.</exception>
         /// <exception cref="ArgumentNullException">HttpClient cannot be null.</exception>
+        /// <exception cref="ArgumentNullException">TimeCamp Token is missing.</exception>
         private static void SanityCheck(HttpClient httpClient)
         {
             if (httpClient == null)
                 throw new ArgumentNullException("HttpClient cannot be null.");
 
             if (!httpClient.DefaultRequestHeaders.Contains("Authorization"))
-                throw new NotSupportedException("TimeCamp Token is missing.");
+                throw new ArgumentNullException("TimeCamp Token is missing.");
         }
 
         /// <summary>

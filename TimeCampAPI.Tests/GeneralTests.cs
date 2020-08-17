@@ -57,7 +57,8 @@ namespace TimeCampAPI.Tests
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHttpClient<ITimeCampService, TimeCampService>();
-            }).UseConsoleLifetime();
+            })
+            .UseConsoleLifetime();
 
         #endregion
 

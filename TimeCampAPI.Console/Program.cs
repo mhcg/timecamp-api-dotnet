@@ -28,19 +28,21 @@ using TimeCampAPI.Core.Interfaces;
 using TimeCampAPI.Core.Services;
 using System.Linq;
 using CommandLine;
+using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 namespace TimeCampAPI.Console
 {
     class Program
     {
-        #region Command Line
-
-        private static System.IServiceProvider Services { get; set; } = null!;
+        private static IServiceProvider Services { get; set; } = null!;
         private static ILogger<Program> Logger { get; set; } = null!;
+
+        #region Command Line
 
         public class GlobalOptions
         {
-            [Option('t', "token", Required = true, HelpText = "TimeCamp API Token.")]
+            [Option('a', "token", Required = true, HelpText = "TimeCamp API Token.")]
             public string TimeCampToken { get; set; } = string.Empty;
         }
 
@@ -56,14 +58,13 @@ namespace TimeCampAPI.Console
 
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<GlobalOptions, GetTimeEntriesOptions>(args)
-                .WithParsed<GlobalOptions>(options =>
-                {
-                    // Init the services stuff.
-                    Services = CreateServiceProvider(options.TimeCampToken);
-                    Logger = Services.GetRequiredService<ILogger<Program>>();
-                    Logger.LogInformation("Services ready.");
-                })
+            // Init the services stuff.
+            Services = CreateHostBuilder(args).Build()
+                .Services.CreateScope().ServiceProvider;
+            Logger = Services.GetRequiredService<ILogger<Program>>();
+            Logger.LogInformation("Services ready.");
+
+            Parser.Default.ParseArguments<GetTimeEntriesOptions>(args)
                 .WithParsed<GetTimeEntriesOptions>(options =>
                 {
                     var fromDate = DateTime.Parse(options.FromDate);
@@ -72,7 +73,33 @@ namespace TimeCampAPI.Console
                 });
         }
 
+        /// <summary>
+        /// Create a Generic Host.
+        /// </summary>
+        /// <param name="args">Args from Program.</param>
+        /// <returns></returns>
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            var switchMappings = new Dictionary<string, string>() {
+                { "-t", "TimeCampAPI:Token" },
+                { "--token", "TimeCampAPI:Token" }
+            };
+
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostContext, config) =>
+                {
+                    config.AddCommandLine(args, switchMappings);
+                })
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddHttpClient<ITimeCampService, TimeCampService>();
+                })
+                .UseConsoleLifetime();
+        }
+
         #endregion
+
+        #region Helper Methods
 
         /// <summary>
         /// Get Time Entries for the selected criteria.
@@ -110,31 +137,6 @@ namespace TimeCampAPI.Console
                 WriteLine(message);
                 Logger.LogError(ex, message);
             }
-        }
-
-        #region Helper Methods
-
-        /// <summary>
-        /// Helper method to create the Host Service Provider.
-        /// </summary>
-        /// <returns>Returns a <see cref="IServiceProvider">IServiceProvider</see>.</returns>
-        private static System.IServiceProvider CreateServiceProvider(string timecampToken)
-        {
-            // Parameter check.
-            if (string.IsNullOrWhiteSpace(timecampToken))
-                throw new System.ArgumentNullException("TimeCamp Token cannot be empty.");
-
-            //TimeCampService.TimeCampToken = timecampToken;
-
-            var builder = new HostBuilder()
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddHttpClient<ITimeCampService, TimeCampService>();
-                }).UseConsoleLifetime();
-
-            var host = builder.Build();
-            var serviceScope = host.Services.CreateScope();
-            return serviceScope.ServiceProvider;
         }
 
         #endregion
