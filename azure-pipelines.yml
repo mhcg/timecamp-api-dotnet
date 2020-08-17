@@ -22,8 +22,16 @@ variables:
   buildConfiguration: 'Release'
   dotnetSdkVersion: '3.1.x'
   buildProjects: 'TimeCampAPI.Core/*.csproj'
+  TimeCampAPI__Token: $(TimeCampAPIToken)
 
 steps:
+- task: AzureKeyVault@1
+  inputs:
+    azureSubscription: 'CloudEssentials(d2626ad0-5fb0-45ba-8746-602220257bc6)'
+    KeyVaultName: 'PipelinesKeyVault6031'
+    SecretsFilter: '*'
+    RunAsPreJob: true
+
 - task: UseDotNet@2
   displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
   inputs:
