@@ -38,7 +38,6 @@ steps:
       # Write your commands here
       
       echo '{ "TimeCampAPI": { "Token": "$(TimeCampAPIToken)" } }' > appsettings.json
-    workingDirectory: '$(Agent.BuildDirectory)/TimeCampAPI.Tests'
 
 - task: UseDotNet@2
   displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
