@@ -1,0 +1,8 @@
+{
+	"recommendations": [
+		"ms-dotnettools.csharp",
+		"k--kato.docomment",
+		"github.vscode-pull-request-github",
+		"formulahendry.dotnet-test-explorer"
+	],
+}
