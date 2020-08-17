@@ -22,7 +22,6 @@ variables:
   buildConfiguration: 'Release'
   dotnetSdkVersion: '3.1.x'
   buildProjects: 'TimeCampAPI.Core/*.csproj'
-  TimeCampAPI.Token: $(TimeCampAPIToken)
 
 steps:
 - task: AzureKeyVault@1
@@ -32,10 +31,14 @@ steps:
     SecretsFilter: '*'
     RunAsPreJob: true
 
-- task: FileTransform@2
+- task: Bash@3
   inputs:
-    folderPath: '$(System.DefaultWorkingDirectory)'
-    jsonTargetFiles: '**/appsettings.json'
+    targetType: 'inline'
+    script: |
+      # Write your commands here
+      
+      echo '{ "TimeCampAPI": { "Token": "$(TimeCampAPIToken)" } }' > appsettings.json
+    workingDirectory: '$(Agent.BuildDirectory)/TimeCampAPI.Tests'
 
 - task: UseDotNet@2
   displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
