@@ -22,7 +22,7 @@ variables:
   buildConfiguration: 'Release'
   dotnetSdkVersion: '3.1.x'
   buildProjects: 'TimeCampAPI.Core/*.csproj'
-  TimeCampAPI__Token: $(TimeCampAPIToken)
+  TimeCampAPI.Token: $(TimeCampAPIToken)
 
 steps:
 - task: AzureKeyVault@1
@@ -31,6 +31,11 @@ steps:
     KeyVaultName: 'PipelinesKeyVault6031'
     SecretsFilter: '*'
     RunAsPreJob: true
+
+- task: FileTransform@2
+  inputs:
+    folderPath: '$(System.DefaultWorkingDirectory)'
+    jsonTargetFiles: '**/appsettings.json'
 
 - task: UseDotNet@2
   displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
