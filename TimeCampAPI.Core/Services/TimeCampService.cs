@@ -25,46 +25,46 @@ using System.Threading.Tasks;
 using TimeCampAPI.Core.Interfaces;
 using TimeCampAPI.Core.Models;
 using System;
-using System.Text;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using TimeCampAPI.Core.Options;
 
 namespace TimeCampAPI.Core.Services
 {
     public partial class TimeCampService : ITimeCampService
     {
-        private static string _timeCampToken = "";
-
+        internal TimeCampOptions TimeCampOptions { get; private set; }
         private HttpClient HttpClient { get; }
+        private ILogger Logger { get; }
 
+        public TimeCampService(HttpClient httpClient,
+            IConfiguration configuration, ILogger<TimeCampService> logger)
+        {
+            // Logger setup.
+            Logger = logger;
+
+            // Configuration setup.
+            TimeCampOptions = configuration.GetSection(TimeCampOptions.SectionName)
+                .Get<TimeCampOptions>();
+
+            // HttpClient setup.
+            if (null != TimeCampOptions && !string.IsNullOrWhiteSpace(TimeCampOptions.Token))
+            {
+                httpClient.DefaultRequestHeaders
+                    .Add("Authorization", TimeCampOptions.Token);
+                HttpClient = httpClient;
+            }
+        }
+
+        /// <summary>
+        /// Shared JsonSerializerOptions for use by API calls.
+        /// </summary>
         private static JsonSerializerOptions JsonSerializerOptions { get; }
             = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-
-        public TimeCampService(HttpClient httpClient)
-        {
-            SanityCheck(httpClient);
-
-            HttpClient = httpClient;
-        }
-
-        /// <summary>
-        /// Set the TimeCamp Token required to access the API.
-        /// </summary>
-        /// <exception cref="ArgumentNullException">Token cannot be empty.</exception>
-        public static string TimeCampToken
-        {
-            private get => _timeCampToken;
-
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentNullException();
-
-                _timeCampToken = value;
-            }
-        }
 
         /// <summary>
         /// Get TimeCamp Time Entires.
@@ -75,7 +75,7 @@ namespace TimeCampAPI.Core.Services
         /// <param name="userIDs">List of User IDs to filter the Time Enteries.</param>
         /// <returns>List of TimeEntry objects.</returns>
         /// <exception cref="ArgumentOutOfRangeException">If From Date is before To Date.</exception>
-        public async Task<IEnumerable<TimeEntry>> GetTimeEntries(
+        public async Task<IEnumerable<TimeEntry>> GetTimeEntriesAsync(
             DateTime fromDate, DateTime toDate,
             IEnumerable<string>? taskIDs = null,
             IEnumerable<string>? userIDs = null)
@@ -83,7 +83,11 @@ namespace TimeCampAPI.Core.Services
             // Sanity check of params etc.
             SanityCheck();
             if (toDate < fromDate)
-                throw new ArgumentOutOfRangeException("To Date cannot be earlier from From Date.");
+            {
+                var message = "To Date cannot be earlier from From Date.";
+                Logger.LogError(message, fromDate, toDate, taskIDs, userIDs);
+                throw new ArgumentOutOfRangeException(message);
+            }
 
             // Call entries API.
             var uri = @"https://www.timecamp.com/third_party/api" +
@@ -99,6 +103,7 @@ namespace TimeCampAPI.Core.Services
             {
                 uri += $"/user_ids/{string.Join(',', userIDs!)}";
             }
+            Logger.LogDebug($"uri: {uri}");
             var response = await HttpClient.GetAsync(uri);
             response.EnsureSuccessStatusCode();
 

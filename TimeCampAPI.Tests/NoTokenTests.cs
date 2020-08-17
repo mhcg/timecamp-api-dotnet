@@ -23,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TimeCampAPI.Core.Services;
 using TimeCampAPI.Core.Interfaces;
+using System.Threading.Tasks;
 
 namespace TimeCampAPI.Tests
 {
@@ -49,26 +50,25 @@ namespace TimeCampAPI.Tests
         /// <returns></returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                // Clear configuration to make sure no TimeCamp Token is available.
+                config.Sources.Clear();
+            })
             .ConfigureServices((hostContext, services) =>
             {
-                services.AddHttpClient<ITimeCampService, TimeCampService>(client =>
-                {
-                    // Not really needed but making it clear the Authorisztion
-                    // header should NOT be present for these tests.
-                    client.DefaultRequestHeaders.Clear();
-                });
+                services.AddHttpClient<ITimeCampService, TimeCampService>();
             }).UseConsoleLifetime();
 
         #endregion
 
         [Fact]
-        public void CannotWorkWithNoToken()
+        public async void CannotWorkWithNoToken()
         {
-            // Try calling with no token set.
-            var now = System.DateTime.UtcNow;
-            Assert.ThrowsAsync<System.ArgumentOutOfRangeException>(async () =>
-                _ = await Services.GetService<ITimeCampService>()
-                    .GetTimeEntries(now, now));
+            var nonsenseTime = System.DateTime.MaxValue;
+            Task result() => Services.GetService<ITimeCampService>()
+                    .GetTimeEntriesAsync(nonsenseTime, nonsenseTime);
+            await Assert.ThrowsAsync<System.ArgumentNullException>(result);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace TimeCampAPI.Core.Interfaces
         /// <param name="userIDs">List of User IDs to filter the Time Enteries.</param>
         /// <returns>List of TimeEntry objects.</returns>
         /// <exception cref="ArgumentOutOfRangeException">If From Date is before To Date.</exception>
-        Task<IEnumerable<TimeEntry>> GetTimeEntries(
+        Task<IEnumerable<TimeEntry>> GetTimeEntriesAsync(
             DateTime fromDate, DateTime toDate,
             IEnumerable<string>? taskIDs = null,
             IEnumerable<string>? userIDs = null);

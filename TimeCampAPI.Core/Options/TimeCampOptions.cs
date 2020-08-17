@@ -22,7 +22,7 @@ namespace TimeCampAPI.Core.Options
 {
     public class TimeCampOptions
     {
-        public const string TimeCampAPI = "TimeCampAPI";
+        public const string SectionName = "TimeCampAPI";
 
         public string Token { get; set; } = "";
     }

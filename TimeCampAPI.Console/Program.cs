@@ -86,7 +86,7 @@ namespace TimeCampAPI.Console
             {
                 var timeCampService = Services.GetService<ITimeCampService>();
 
-                var getTimeEntries = await timeCampService.GetTimeEntries(
+                var getTimeEntries = await timeCampService.GetTimeEntriesAsync(
                     fromDate: fromDate,
                     toDate: toDate,
                     taskIDs: null,
@@ -124,7 +124,7 @@ namespace TimeCampAPI.Console
             if (string.IsNullOrWhiteSpace(timecampToken))
                 throw new System.ArgumentNullException("TimeCamp Token cannot be empty.");
 
-            TimeCampService.TimeCampToken = timecampToken;
+            //TimeCampService.TimeCampToken = timecampToken;
 
             var builder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>

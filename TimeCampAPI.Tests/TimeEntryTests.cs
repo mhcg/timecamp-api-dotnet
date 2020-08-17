@@ -28,10 +28,11 @@ using System.Linq;
 using System.Collections.Generic;
 using TimeCampAPI.Core.Models;
 using TimeCampAPI.Core.Options;
+using System.Threading.Tasks;
 
 namespace TimeCampAPI.Tests
 {
-    public class GeneralTests
+    public class TimeEntryTests
     {
         #region Tests setup.
 
@@ -40,7 +41,7 @@ namespace TimeCampAPI.Tests
         /// <summary>
         /// Set up Services for use by tests.
         /// </summary>
-        public GeneralTests()
+        public TimeEntryTests()
         {
             string[] args = { };
             Services = CreateHostBuilder(args).Build()
@@ -62,13 +63,28 @@ namespace TimeCampAPI.Tests
         #endregion
 
         [Fact]
-        public async void CanAccessService()
+        public async void InvalidDatesThrows()
         {
-            var nonsenseTime = System.DateTime.MaxValue;
-            var result = await Services.GetService<ITimeCampService>()
-                    .GetTimeEntriesAsync(nonsenseTime, nonsenseTime);
-            Assert.NotNull(result);
-            Assert.Equal(result, new List<TimeEntry>());
+            // Exception should be throw if From Date is After To Date.
+            var fromDate = System.DateTime.MaxValue;
+            var toDate = System.DateTime.MinValue;
+
+            Task result() => Services.GetService<ITimeCampService>()
+                    .GetTimeEntriesAsync(fromDate, toDate);
+            await Assert.ThrowsAsync<System.ArgumentOutOfRangeException>(result);
+        }
+
+        [Fact]
+        public async void ValidDatesReturnsSomething()
+        {
+            // TODO: Refactor this when more CUD methods available.
+            // For now assuming a live account returns something.
+            var fromDate = System.DateTime.MinValue;
+            var toDate = System.DateTime.MaxValue;
+
+            IEnumerable<TimeEntry> result = await Services.GetService<ITimeCampService>()
+                    .GetTimeEntriesAsync(fromDate, toDate);
+            Assert.True(result.Any());
         }
     }
 }
