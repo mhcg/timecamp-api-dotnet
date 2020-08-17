@@ -31,14 +31,6 @@ steps:
     SecretsFilter: '*'
     RunAsPreJob: true
 
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: |
-      # Write your commands here
-      
-      echo '{ "TimeCampAPI": { "Token": "$(TimeCampAPIToken)" } }' > appsettings.json
-
 - task: UseDotNet@2
   displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
   inputs:
@@ -58,6 +50,8 @@ steps:
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test $(buildConfiguration) on $(imageName)'
+  env:
+    TIMECAMPAPI__TOKEN: $(TimeCampAPIToken)
   inputs:
     command: test
     projects: '**/*Tests/*.csproj'
