@@ -10,10 +10,13 @@ strategy:
   matrix:
     linux:
       imageName: 'ubuntu-latest'
+      TimeCampAPI..Token: $(TimeCampAPI__Token)
     mac:
       imageName: 'macos-latest'
+      TimeCampAPI..Token: $(TimeCampAPI__Token)
     windows:
       imageName: 'windows-latest'
+      TimeCampAPI__Token: $(TimeCampAPI__Token)
 
 pool:
   vmImage: $(imageName)
