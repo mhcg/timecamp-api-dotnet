@@ -21,7 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TimeCampAPI.Core.Models;
+using TimeCampAPI.Core.Models.TimeCamp;
 
 namespace TimeCampAPI.Core.Interfaces
 {

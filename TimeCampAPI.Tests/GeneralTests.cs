@@ -21,13 +21,10 @@
 using Xunit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using TimeCampAPI.Core.Services;
 using TimeCampAPI.Core.Interfaces;
-using System.Linq;
 using System.Collections.Generic;
-using TimeCampAPI.Core.Models;
-using TimeCampAPI.Core.Options;
+using TimeCampAPI.Core.Models.TimeCamp;
 
 namespace TimeCampAPI.Tests
 {
@@ -65,9 +62,9 @@ namespace TimeCampAPI.Tests
         [Fact]
         public async void CanAccessService()
         {
-            var nonsenseTime = System.DateTime.MaxValue;
+            var nonsenseDate = new System.DateTime(1901, 1, 1);
             var result = await Services.GetService<ITimeCampService>()
-                    .GetTimeEntriesAsync(nonsenseTime, nonsenseTime);
+                    .GetTimeEntriesAsync(nonsenseDate, nonsenseDate);
             Assert.NotNull(result);
             Assert.Equal(result, new List<TimeEntry>());
         }

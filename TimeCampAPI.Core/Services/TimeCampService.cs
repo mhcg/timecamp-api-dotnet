@@ -23,7 +23,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TimeCampAPI.Core.Interfaces;
-using TimeCampAPI.Core.Models;
+using TimeCampAPI.Core.Models.TimeCamp;
 using System;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -45,11 +45,11 @@ namespace TimeCampAPI.Core.Services
             Logger = logger;
 
             // Configuration setup.
-            TimeCampOptions = configuration.GetSection(TimeCampOptions.SectionName)
-                .Get<TimeCampOptions>();
+            TimeCampOptions = configuration.GetSection(TimeCampOptions.SectionName)?
+                .Get<TimeCampOptions>() ?? new TimeCampOptions();
 
             // HttpClient setup.
-            if (null != TimeCampOptions && !string.IsNullOrWhiteSpace(TimeCampOptions.Token))
+            if (!string.IsNullOrWhiteSpace(TimeCampOptions.Token))
             {
                 httpClient.DefaultRequestHeaders
                     .Add("Authorization", TimeCampOptions.Token);

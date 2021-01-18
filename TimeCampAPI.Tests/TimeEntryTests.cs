@@ -21,13 +21,11 @@
 using Xunit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using TimeCampAPI.Core.Services;
 using TimeCampAPI.Core.Interfaces;
 using System.Linq;
 using System.Collections.Generic;
-using TimeCampAPI.Core.Models;
-using TimeCampAPI.Core.Options;
+using TimeCampAPI.Core.Models.TimeCamp;
 using System.Threading.Tasks;
 
 namespace TimeCampAPI.Tests
