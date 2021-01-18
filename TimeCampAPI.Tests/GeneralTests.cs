@@ -63,7 +63,7 @@ namespace TimeCampAPI.Tests
         public async void CanAccessService()
         {
             var nonsenseDate = new System.DateTime(1901, 1, 1);
-            var result = await Services.GetService<ITimeCampService>()
+            var result = await Services.GetRequiredService<ITimeCampService>()
                     .GetTimeEntriesAsync(nonsenseDate, nonsenseDate);
             Assert.NotNull(result);
             Assert.Equal(result, new List<TimeEntry>());

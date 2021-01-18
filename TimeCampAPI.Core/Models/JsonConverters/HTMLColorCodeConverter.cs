@@ -32,7 +32,7 @@ namespace TimeCampAPI.Core.Models.JsonConverters
             ref Utf8JsonReader reader,
             Type typeToConvert,
             JsonSerializerOptions options) =>
-                ColorTranslator.FromHtml(reader.GetString());
+                ColorTranslator.FromHtml(reader.GetString() ?? @"");
 
         // Convert Color object to HTML Color Code.
         public override void Write(

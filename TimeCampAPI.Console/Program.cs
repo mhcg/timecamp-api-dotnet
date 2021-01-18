@@ -138,7 +138,7 @@ namespace TimeCampAPI.Console
         {
             try
             {
-                var timeCampService = Services.GetService<ITimeCampService>();
+                var timeCampService = Services.GetRequiredService<ITimeCampService>();
 
                 var getTimeEntries = await timeCampService.GetTimeEntriesAsync(
                     fromDate: fromDate,
@@ -173,7 +173,7 @@ namespace TimeCampAPI.Console
             try
             {
                 // Get time entries from API.
-                var timeCampService = Services.GetService<ITimeCampService>();
+                var timeCampService = Services.GetRequiredService<ITimeCampService>();
                 var getTimeEntries = await timeCampService.GetTimeEntriesAsync(
                     fromDate: fromDate,
                     toDate: toDate,

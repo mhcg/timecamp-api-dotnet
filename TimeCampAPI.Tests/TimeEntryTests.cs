@@ -67,7 +67,7 @@ namespace TimeCampAPI.Tests
             var fromDate = System.DateTime.MaxValue;
             var toDate = System.DateTime.MinValue;
 
-            Task result() => Services.GetService<ITimeCampService>()
+            Task result() => Services.GetRequiredService<ITimeCampService>()
                     .GetTimeEntriesAsync(fromDate, toDate);
             await Assert.ThrowsAsync<System.ArgumentOutOfRangeException>(result);
         }
@@ -80,7 +80,7 @@ namespace TimeCampAPI.Tests
             var fromDate = System.DateTime.MinValue;
             var toDate = System.DateTime.MaxValue;
 
-            IEnumerable<TimeEntry> result = await Services.GetService<ITimeCampService>()
+            IEnumerable<TimeEntry> result = await Services.GetRequiredService<ITimeCampService>()
                     .GetTimeEntriesAsync(fromDate, toDate);
             Assert.True(result.Any());
         }

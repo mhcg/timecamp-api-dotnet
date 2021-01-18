@@ -45,7 +45,7 @@ namespace TimeCampAPI.Core.Services
             Logger = logger;
 
             // Configuration setup.
-            TimeCampOptions = configuration.GetSection(TimeCampOptions.SectionName)?
+            TimeCampOptions = configuration.GetSection(TimeCampOptions.SectionName)
                 .Get<TimeCampOptions>() ?? new TimeCampOptions();
 
             // HttpClient setup.
@@ -111,7 +111,7 @@ namespace TimeCampAPI.Core.Services
             using var responseStream = await response.Content.ReadAsStreamAsync();
             var result = await JsonSerializer.DeserializeAsync
                 <IList<TimeEntry>>(responseStream, JsonSerializerOptions);
-            return result;
+            return result ?? new List<TimeEntry>();
         }
 
         #region Helper Methods

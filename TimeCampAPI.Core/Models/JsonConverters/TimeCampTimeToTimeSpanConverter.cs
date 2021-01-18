@@ -31,7 +31,7 @@ namespace TimeCampAPI.Core.Models.JsonConverters
             ref Utf8JsonReader reader,
             Type typeToConvert,
             JsonSerializerOptions options) =>
-                TimeSpan.Parse(reader.GetString());
+                TimeSpan.Parse(reader.GetString() ?? @"");
 
         // Convert TimeSpan to string in TimeCamp format.
         public override void Write(

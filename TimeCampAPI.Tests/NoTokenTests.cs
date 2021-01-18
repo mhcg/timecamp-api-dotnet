@@ -67,7 +67,7 @@ namespace TimeCampAPI.Tests
         public async void CannotWorkWithNoToken()
         {
             var nonsenseTime = System.DateTime.MaxValue;
-            Task result() => Services.GetService<ITimeCampService>()
+            Task result() => Services.GetRequiredService<ITimeCampService>()
                     .GetTimeEntriesAsync(nonsenseTime, nonsenseTime);
             await Assert.ThrowsAsync<System.ArgumentNullException>(result);
         }
