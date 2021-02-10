@@ -55,19 +55,9 @@ namespace TimeCampAPI.Console
 
             [Option('t', "to", Required = true, HelpText = "Date to get Time Entries To.")]
             public string ToDate { get; set; } = string.Empty;
-        }
 
-        [Verb("GetPeopleTimeLogsCSV", HelpText = "Output Time Entries in CSV suitable for import into Zoho People.")]
-        public class GetPeopleTimeLogsCSVOptions : GlobalOptions
-        {
-            [Option('f', "from", Required = true, HelpText = "Date to get Time Entries From.")]
-            public string FromDate { get; set; } = string.Empty;
-
-            [Option('t', "to", Required = true, HelpText = "Date to get Time Entries To.")]
-            public string ToDate { get; set; } = string.Empty;
-
-            [Option('b', "only-billable", Required = false, Default = false, HelpText = "Only include billable")]
-            public bool Billable { get; set; } = false;
+            [Option('c', "csv", Required = false, Default = false, HelpText = "Output Time Entries in CSV format.")]
+            public bool IsCSV { get; set; } = false;
         }
 
         static void Main(string[] args)
@@ -78,25 +68,17 @@ namespace TimeCampAPI.Console
             Logger = Services.GetRequiredService<ILogger<Program>>();
             Logger.LogInformation("Services ready.");
 
-            Parser.Default.ParseArguments<GetTimeEntriesOptions, GetPeopleTimeLogsCSVOptions>(args)
+            Parser.Default.ParseArguments<GetTimeEntriesOptions>(args)
                 .WithParsed<GetTimeEntriesOptions>(options =>
                 {
                     var fromDate = DateTime.Parse(options.FromDate);
                     var toDate = DateTime.Parse(options.ToDate);
-                    Task.Run(() => GetTimeEntriesAsync(fromDate, toDate)).Wait();
-                })
-                .WithParsed<GetPeopleTimeLogsCSVOptions>(options =>
-                {
-                    var fromDate = DateTime.Parse(options.FromDate);
-                    var toDate = DateTime.Parse(options.ToDate);
-                    bool onlyBillable = options.Billable;
-
                     Task.Run(() =>
-                        GetPeopleTimeLogsCSV(
+                        GetTimeEntriesAsync(
                             fromDate: fromDate,
                             toDate: toDate,
-                            onlyBillable: onlyBillable)
-                        ).Wait();
+                            format: options.IsCSV ? @"CSV" : @""
+                       )).Wait();
                 });
         }
 
@@ -134,60 +116,23 @@ namespace TimeCampAPI.Console
         /// <param name="fromDate">Date to get Time Entries from.</param>
         /// <param name="toDate">Date to get Time Entries to.</param>
         /// <returns></returns>
-        private static async Task GetTimeEntriesAsync(DateTime fromDate, DateTime toDate)
-        {
-            try
-            {
-                var timeCampService = Services.GetRequiredService<ITimeCampService>();
-
-                var getTimeEntries = await timeCampService.GetTimeEntriesAsync(
-                    fromDate: fromDate,
-                    toDate: toDate,
-                    taskIDs: null,
-                    userIDs: null);
-
-                if (0 == getTimeEntries.Count())
-                {
-                    WriteLine("Nothing found!");
-                }
-                else
-                {
-                    foreach (var timeEntry in getTimeEntries)
-                    {
-                        WriteLine(timeEntry.ToString());
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                var message = $"An error occurred - {ex.Message}";
-                WriteLine(message);
-                Logger.LogError(ex, message);
-            }
-        }
-
-        private static async Task GetPeopleTimeLogsCSV(
+        private static async Task GetTimeEntriesAsync(
             DateTime fromDate, DateTime toDate,
-            bool onlyBillable = false)
+            string format = @"")
         {
             try
             {
-                // Get time entries from API.
+                // Get Time Entries.
                 var timeCampService = Services.GetRequiredService<ITimeCampService>();
+
                 var getTimeEntries = await timeCampService.GetTimeEntriesAsync(
                     fromDate: fromDate,
                     toDate: toDate,
                     taskIDs: null,
                     userIDs: null);
 
-                // Filter as needed.
-                if (onlyBillable)
-                {
-                    getTimeEntries = getTimeEntries.Where(t => !!t.Billable);
-                }
-
-                // Return CSV results.
-                if (getTimeEntries.Count() > 1)
+                // Output in relevant format.
+                if (@"CSV" == format)
                 {
                     var output = new StringBuilder();
                     // Headers: Job Name, Project Name, Work Item, Mail Id, Date, From time, To time, Hours, Description.
@@ -196,12 +141,26 @@ namespace TimeCampAPI.Console
                     output.AppendLine("Date,Project Name,Job Name,Work Item,From time,To time,Hours,Description, Mail Id");
                     foreach (var timeEntry in getTimeEntries)
                     {
-                        output.Append(StringWrappedInQuotes($"{timeEntry.TimeEntryDate:dd/MM/yyyy}",","));
+                        output.Append(StringWrappedInQuotes($"{timeEntry.TimeEntryDate:dd/MM/yyyy}", ","));
                         output.Append(StringWrappedInQuotes("", ","));
                         output.Append(StringWrappedInQuotes(timeEntry.TaskName, ","));
                         output.AppendLine(StringWrappedInQuotes(timeEntry.Description));
                     }
                     WriteLine(output.ToString());
+                }
+                else
+                {
+                    if (!getTimeEntries.Any())
+                    {
+                        WriteLine("Nothing found!");
+                    }
+                    else
+                    {
+                        foreach (var timeEntry in getTimeEntries)
+                        {
+                            WriteLine(timeEntry.ToString());
+                        }
+                    }
                 }
             }
             catch (System.Exception ex)
