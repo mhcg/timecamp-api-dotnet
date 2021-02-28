@@ -31,7 +31,7 @@ namespace TimeCampAPI.Core.Models.JsonConverters
             ref Utf8JsonReader reader,
             Type typeToConvert,
             JsonSerializerOptions options) =>
-                new TimeSpan(0, 0, Convert.ToInt32(reader.GetString()));
+                new(0, 0, Convert.ToInt32(reader.GetString()));
 
         // Convert number of seconds to Int32.
         public override void Write(

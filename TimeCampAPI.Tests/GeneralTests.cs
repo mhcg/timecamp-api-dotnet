@@ -25,6 +25,7 @@ using TimeCampAPI.Core.Services;
 using TimeCampAPI.Core.Interfaces;
 using System.Collections.Generic;
 using TimeCampAPI.Core.Models.TimeCamp;
+using System;
 
 namespace TimeCampAPI.Tests
 {
@@ -32,14 +33,14 @@ namespace TimeCampAPI.Tests
     {
         #region Tests setup.
 
-        private static System.IServiceProvider Services { get; set; } = null!;
+        private static IServiceProvider Services { get; set; } = null!;
 
         /// <summary>
         /// Set up Services for use by tests.
         /// </summary>
         public GeneralTests()
         {
-            string[] args = { };
+            var args = Array.Empty<string>();
             Services = CreateHostBuilder(args).Build()
                 .Services.CreateScope().ServiceProvider;
         }
@@ -62,7 +63,7 @@ namespace TimeCampAPI.Tests
         [Fact]
         public async void CanAccessService()
         {
-            var nonsenseDate = new System.DateTime(1901, 1, 1);
+            var nonsenseDate = new DateTime(1901, 1, 1);
             var result = await Services.GetRequiredService<ITimeCampService>()
                     .GetTimeEntriesAsync(nonsenseDate, nonsenseDate);
             Assert.NotNull(result);

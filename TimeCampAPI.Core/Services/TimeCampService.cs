@@ -125,10 +125,10 @@ namespace TimeCampAPI.Core.Services
         private static void SanityCheck(HttpClient httpClient)
         {
             if (httpClient == null)
-                throw new ArgumentNullException("HttpClient cannot be null.");
+                throw new("HttpClient cannot be null.");
 
             if (!httpClient.DefaultRequestHeaders.Contains("Authorization"))
-                throw new ArgumentNullException("TimeCamp Token is missing.");
+                throw new("TimeCamp Token is missing.");
         }
 
         /// <summary>

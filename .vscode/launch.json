@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/TimeCampAPI.Console/bin/Debug/netcoreapp3.1/TimeCampAPI.Console.dll",
+            "program": "${workspaceFolder}/TimeCampAPI.Console/bin/Debug/net5.0/TimeCampAPI.Console.dll",
             "args": [],
             "cwd": "${workspaceFolder}/TimeCampAPI.Console",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
